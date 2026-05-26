@@ -1,0 +1,155 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "institution",
+						"type": "address"
+					}
+				],
+				"name": "InstitutionApproved",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "institution",
+						"type": "address"
+					}
+				],
+				"name": "InstitutionRemoved",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "admin",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "institution",
+						"type": "address"
+					}
+				],
+				"name": "approveInstitution",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"name": "approvedInstitutions",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "institution",
+						"type": "address"
+					}
+				],
+				"name": "isApproved",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "institution",
+						"type": "address"
+					}
+				],
+				"name": "removeInstitution",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"notice": "----------------------------------------------------------------------- INSTITUTION CONTRACT -----------------------------------------------------------------------",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Assignment3/CertProff.sol": "Institution"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Assignment3/CertProff.sol": {
+			"keccak256": "0xfb0406d95f016576943a73566bc52b332526d7a6cd3f8426052619a3520c95d0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0513aa61f701cb3e456faba236894c294863427dc9e1125a33a70244d421f155",
+				"dweb:/ipfs/QmXMfcs2T8Q6gZBRm86j5pfvRQsHKmMF7Sf5h56193Wf8F"
+			]
+		}
+	},
+	"version": 1
+}

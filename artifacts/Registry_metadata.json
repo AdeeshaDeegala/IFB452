@@ -1,0 +1,211 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "institutionAddress",
+						"type": "address"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "credentialID",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "qualificationTitle",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "issuingInstitution",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "graduate",
+						"type": "address"
+					}
+				],
+				"name": "CertificateIssued",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "string",
+						"name": "credentialID",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "enum CertificateStatus",
+						"name": "status",
+						"type": "uint8"
+					}
+				],
+				"name": "StatusUpdated",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_credentialID",
+						"type": "string"
+					}
+				],
+				"name": "getCredential",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum CertificateStatus",
+						"name": "",
+						"type": "uint8"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "institutionContract",
+				"outputs": [
+					{
+						"internalType": "contract Institution",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_credentialID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_qualificationTitle",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "_issuingInstitution",
+						"type": "string"
+					},
+					{
+						"internalType": "address",
+						"name": "_graduateAddress",
+						"type": "address"
+					}
+				],
+				"name": "issueCertificate",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_credentialID",
+						"type": "string"
+					},
+					{
+						"internalType": "enum CertificateStatus",
+						"name": "_status",
+						"type": "uint8"
+					}
+				],
+				"name": "updateStatus",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"notice": "----------------------------------------------------------------------- REGISTRY CONTRACT -----------------------------------------------------------------------",
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Assignment3/CertProff.sol": "Registry"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Assignment3/CertProff.sol": {
+			"keccak256": "0xfb0406d95f016576943a73566bc52b332526d7a6cd3f8426052619a3520c95d0",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0513aa61f701cb3e456faba236894c294863427dc9e1125a33a70244d421f155",
+				"dweb:/ipfs/QmXMfcs2T8Q6gZBRm86j5pfvRQsHKmMF7Sf5h56193Wf8F"
+			]
+		}
+	},
+	"version": 1
+}
