@@ -98,4 +98,1098 @@
         <input type="text" id="institutionAddress" placeholder="Institution Wallet Address">
 
         <button onclick="approveInstitutionUI()">
-... (1,095 lines left)
+            Approve Institution
+        </button>
+
+        <button onclick="removeInstitutionUI()">
+            Remove Institution
+        </button>
+
+        <button onclick="checkInstitutionStatus()">
+            Check Approval Status
+        </button>
+
+        <div id="institutionResult"></div>
+    </div>
+
+    <!-- ISSUE CERTIFICATE -->
+
+    <div class="card">
+        <h2>Issue Certificate</h2>
+
+        <input type="text" id="credentialID" placeholder="Credential ID">
+
+        <input type="text" id="qualificationTitle" placeholder="Qualification Title">
+
+        <input type="text" id="institutionName" placeholder="Issuing Institution">
+
+        <input type="text" id="graduateAddress" placeholder="Graduate Wallet Address">
+
+        <button onclick="issueCertificate()">
+            Issue Certificate
+        </button>
+    </div>
+
+    <!-- UPDATE STATUS -->
+
+    <div class="card">
+        <h2>Update Credential Status</h2>
+
+        <input type="text" id="updateCredentialID" placeholder="Credential ID">
+
+        <select id="statusSelect">
+            <option value="Active">Active</option>
+            <option value="Revoked">Revoked</option>
+            <option value="Corrected">Corrected</option>
+            <option value="Replaced">Replaced</option>
+        </select>
+
+        <button onclick="updateStatus()">
+            Update Status
+        </button>
+    </div>
+
+    <!-- VERIFY CREDENTIAL -->
+
+    <div class="card">
+        <h2>Verify Credential</h2>
+
+        <input type="text" id="verifyCredentialID" placeholder="Enter Credential ID">
+
+        <button onclick="verifyCredential()">
+            Verify Credential
+        </button>
+
+        <div id="verificationResult"></div>
+    </div>
+
+    <div class="card">
+        <h2>Credential Token (NFT Minting)</h2>
+
+        <input type="text" id="mintCredentialID" placeholder="Credential ID">
+
+        <button onclick="mintCredentialToken()">
+            Mint Credential Token
+        </button>
+
+        <button onclick="viewTokens()">
+            View My Tokens
+        </button>
+
+        <div id="tokenResult"></div>
+    </div>
+
+    <div> 
+        <button onclick="connectWallet()">
+        Connect MetaMask
+        </button>
+        <p id="walletAddress"></p>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+
+<script>
+
+    // =====================================================
+    // PROVIDER
+    // =====================================================
+
+    let provider;
+    let signer;
+    let currentAccount;
+
+    // =====================================================
+    // CONTRACT ADDRESSES
+    // =====================================================
+
+    const institutionContractAddress =
+        "0x9828bf1Db5a33185eaA7a5Bf0cC908b0776a3E0F";
+
+    const registryContractAddress =
+        "0x83829e3953cE18a25563F021A2a0E966C39452b0";
+
+    const verificationContractAddress =
+        "0x8D3e3846b848b67a6fC3C76E33Cc4805005B11aC";
+
+    const credentialTokenContractAddress =
+        "0x17fd85DaB147DbD4B55e224DC6B15Eda32Ec013C";
+
+    // =====================================================
+    // CONTRACT ABIS
+    // =====================================================
+
+    // KEEP YOUR EXISTING ABIs HERE
+    const institutionABI = [
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "institution",
+				"type": "address"
+			}
+		],
+		"name": "InstitutionApproved",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "institution",
+				"type": "address"
+			}
+		],
+		"name": "InstitutionRemoved",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "admin",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "institution",
+				"type": "address"
+			}
+		],
+		"name": "approveInstitution",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"name": "approvedInstitutions",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "institution",
+				"type": "address"
+			}
+		],
+		"name": "isApproved",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "institution",
+				"type": "address"
+			}
+		],
+		"name": "removeInstitution",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+    const registryABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "institutionAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "credentialID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "qualificationTitle",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "issuingInstitution",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "graduate",
+				"type": "address"
+			}
+		],
+		"name": "CertificateIssued",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "credentialID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum CertificateStatus",
+				"name": "status",
+				"type": "uint8"
+			}
+		],
+		"name": "StatusUpdated",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialID",
+				"type": "string"
+			}
+		],
+		"name": "getCredential",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "enum CertificateStatus",
+				"name": "",
+				"type": "uint8"
+			},
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "institutionContract",
+		"outputs": [
+			{
+				"internalType": "contract Institution",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialID",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_qualificationTitle",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_issuingInstitution",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "_graduateAddress",
+				"type": "address"
+			}
+		],
+		"name": "issueCertificate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialID",
+				"type": "string"
+			},
+			{
+				"internalType": "enum CertificateStatus",
+				"name": "_status",
+				"type": "uint8"
+			}
+		],
+		"name": "updateStatus",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	}
+];
+    const verificationABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "registryAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [],
+		"name": "registry",
+		"outputs": [
+			{
+				"internalType": "contract Registry",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialID",
+				"type": "string"
+			}
+		],
+		"name": "verifyCredential",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "string",
+						"name": "credentialID",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "qualificationTitle",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "issuingInstitution",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "issueDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum CertificateStatus",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
+						"internalType": "bool",
+						"name": "valid",
+						"type": "bool"
+					}
+				],
+				"internalType": "struct Verification.VerificationResult",
+				"name": "",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+    const credentialTokenABI = [
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "registryAddress",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenID",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "credentialID",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "graduate",
+				"type": "address"
+			}
+		],
+		"name": "CredentialMinted",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_credentialID",
+				"type": "string"
+			}
+		],
+		"name": "mintCredential",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "name",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "registry",
+		"outputs": [
+			{
+				"internalType": "contract Registry",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "symbol",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "tokens",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "tokenID",
+				"type": "uint256"
+			},
+			{
+				"internalType": "string",
+				"name": "credentialID",
+				"type": "string"
+			},
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+];
+    // =====================================================
+    // CONTRACT OBJECTS
+    // =====================================================
+
+    let institutionContract;
+    let registryContract;
+    let verificationContract;
+    let credentialTokenContract;
+
+    // =====================================================
+    // CONNECT WALLET
+    // =====================================================
+
+    async function connectWallet() {
+
+    try {
+
+        if (!window.ethereum) {
+            alert("MetaMask not installed");
+            return;
+        }
+
+        provider =
+            new ethers.providers.Web3Provider(
+                window.ethereum
+            );
+
+        await provider.send(
+            "eth_requestAccounts",
+            []
+        );
+
+        signer = provider.getSigner();
+
+        currentAccount =
+            await signer.getAddress();
+
+        console.log(
+            "Connected wallet:",
+            currentAccount
+        );
+
+        // =========================================
+        // INITIALISE CONTRACTS
+        // =========================================
+
+        console.log("Creating Institution Contract...");
+
+        institutionContract =
+            new ethers.Contract(
+                institutionContractAddress,
+                institutionABI,
+                signer
+            );
+
+        console.log("Institution OK");
+
+        console.log("Creating Registry Contract...");
+
+        registryContract =
+            new ethers.Contract(
+                registryContractAddress,
+                registryABI,
+                signer
+            );
+
+        console.log("Registry OK");
+
+        console.log("Creating Verification Contract...");
+
+        verificationContract =
+            new ethers.Contract(
+                verificationContractAddress,
+                verificationABI,
+                signer
+            );
+
+        console.log("Verification OK");
+
+        credentialTokenContract =
+            new ethers.Contract(
+                credentialTokenContractAddress,
+                credentialTokenABI,
+                signer
+            );
+
+        console.log("Credential Token OK");
+
+        alert(
+            "Wallet Connected:\n" +
+            currentAccount
+        );
+
+    } catch(error) {
+
+        console.error(
+            "CONNECT ERROR:",
+            error
+        );
+
+        alert(
+            error.message
+        );
+    }
+}
+
+    // =====================================================
+    // VIEW TOKENS
+    // =====================================================
+
+    async function viewTokens() {
+
+    try {
+
+        let output = "";
+
+        for (let i = 1; i <= 20; i++) {
+
+            try {
+
+                const token =
+                    await credentialTokenContract.tokens(i);
+
+                if (token.tokenID.toNumber() === 0) continue;
+
+                output += `
+                    <div class="result">
+                        <strong>Token ID:</strong> ${token.tokenID}<br>
+                        <strong>Credential:</strong> ${token.credentialID}<br>
+                        <strong>Owner:</strong> ${token.owner}
+                    </div>
+                    <br>
+                `;
+
+            } catch (e) {
+                break;
+            }
+        }
+
+        document.getElementById("tokenResult").innerHTML =
+            output || "No tokens found";
+
+    } catch (error) {
+
+        console.error(error);
+        alert(error.message);
+    }
+}
+
+    // =====================================================
+    // MINT CREDENTIAL
+    // =====================================================    
+
+    async function mintCredentialToken() {
+
+    try {
+
+        const credentialID =
+            document.getElementById("mintCredentialID").value;
+
+        if (!credentialID) {
+            alert("Enter credential ID");
+            return;
+        }
+
+        const tx =
+            await credentialTokenContract.mintCredential(
+                credentialID
+            );
+
+        alert("Transaction sent: " + tx.hash);
+
+        await tx.wait();
+
+        alert("Credential Token Minted");
+
+    } catch (error) {
+
+        console.error(error);
+        alert(error.reason || error.message);
+    }
+}
+
+    // =====================================================
+    // APPROVE INSTITUTION
+    // =====================================================
+
+    async function approveInstitutionUI() {
+
+    try {
+
+        const addr =
+            document.getElementById("institutionAddress").value;
+
+        if (!addr) {
+            alert("Enter institution address");
+            return;
+        }
+
+        const tx =
+            await institutionContract.approveInstitution(addr);
+
+        alert("Transaction sent: " + tx.hash);
+
+        await tx.wait();
+
+        alert("Institution Approved");
+
+    } catch (error) {
+
+        console.error(error);
+        alert(error.reason || error.message);
+    }
+}
+
+    // =====================================================
+    // REMOVE INSTITUTION
+    // =====================================================
+
+    async function removeInstitutionUI() {
+
+    try {
+
+        const addr =
+            document.getElementById("institutionAddress").value;
+
+        if (!addr) {
+            alert("Enter institution address");
+            return;
+        }
+
+        const tx =
+            await institutionContract.removeInstitution(addr);
+
+        alert("Transaction sent: " + tx.hash);
+
+        await tx.wait();
+
+        alert("Institution Removed");
+
+    } catch (error) {
+
+        console.error(error);
+        alert(error.reason || error.message);
+    }
+}
+
+    // =====================================================
+    // VERIFY INSTITUTION
+    // =====================================================
+
+    async function checkInstitutionStatus() {
+
+    try {
+
+        const addr =
+            document.getElementById("institutionAddress").value;
+
+        if (!addr) {
+            alert("Enter institution address");
+            return;
+        }
+
+        const isApproved =
+            await institutionContract.isApproved(addr);
+
+        document.getElementById("institutionResult").innerHTML =
+            `
+            <div class="result">
+                <strong>Institution:</strong> ${addr}<br>
+                <strong>Status:</strong>
+                <span style="color:${isApproved ? 'green' : 'red'}">
+                    ${isApproved ? "APPROVED" : "NOT APPROVED"}
+                </span>
+            </div>
+            `;
+
+    } catch (error) {
+
+        console.error(error);
+        alert(error.message);
+    }
+}
+
+    // =====================================================
+    // ISSUE CERTIFICATE
+    // =====================================================
+
+    async function issueCertificate() {
+        console.log("Registry Contract:", registryContract);
+        
+        try {
+
+            // Read values from form
+            const credentialID =
+                document.getElementById(
+                    "credentialID"
+                ).value;
+
+            const qualificationTitle =
+                document.getElementById(
+                    "qualificationTitle"
+                ).value;
+
+            const institutionName =
+                document.getElementById(
+                    "institutionName"
+                ).value;
+
+            const graduateAddress =
+                document.getElementById(
+                    "graduateAddress"
+                ).value;
+
+            // Validation
+            if (
+                !credentialID ||
+                !qualificationTitle ||
+                !institutionName ||
+                !graduateAddress
+            ) {
+                alert("Please fill all fields");
+                return;
+            }
+
+            // Send transaction
+            const tx =
+                await registryContract.issueCertificate(
+                    credentialID,
+                    qualificationTitle,
+                    institutionName,
+                    graduateAddress
+                );
+
+            alert(
+                "Transaction submitted...\n" +
+                tx.hash
+            );
+
+            await tx.wait();
+
+            alert(
+                "Certificate Issued Successfully"
+            );
+
+        } catch(error) {
+
+            console.error(error);
+
+            alert(
+                error.reason ||
+                error.message
+            );
+        }
+    }
+
+    // =====================================================
+    // UPDATE STATUS
+    // =====================================================
+
+    async function updateStatus() {
+
+        try {
+
+            const credentialID =
+                document.getElementById(
+                    "updateCredentialID"
+                ).value;
+
+            const statusText =
+                document.getElementById(
+                    "statusSelect"
+                ).value;
+
+            // ENUM mapping
+            const statusMap = {
+                "Active": 0,
+                "Revoked": 1,
+                "Corrected": 2,
+                "Replaced": 3
+            };
+
+            const statusValue =
+                statusMap[statusText];
+
+            const tx =
+                await registryContract.updateStatus(
+                    credentialID,
+                    statusValue
+                );
+
+            alert(
+                "Transaction submitted...\n" +
+                tx.hash
+            );
+
+            await tx.wait();
+
+            alert(
+                "Credential Status Updated"
+            );
+
+        } catch(error) {
+
+            console.error(error);
+
+            alert(
+                error.reason ||
+                error.message
+            );
+        }
+    }
+
+    // =====================================================
+    // VERIFY CREDENTIAL
+    // =====================================================
+
+    async function verifyCredential() {
+
+        try {
+
+            const credentialID =
+                document.getElementById(
+                    "verifyCredentialID"
+                ).value;
+
+            const result =
+                await verificationContract.verifyCredential(
+                    credentialID
+                );
+
+            const statuses = [
+                "Active",
+                "Revoked",
+                "Corrected",
+                "Replaced"
+            ];
+
+            // Convert UNIX timestamp
+            const issueDate =
+                new Date(
+                    result.issueDate.toNumber() * 1000
+                );
+
+            // Display results
+            document.getElementById(
+                "verificationResult"
+            ).innerHTML = `
+
+                <div class="result">
+
+                    <h3>Verification Result</h3>
+
+                    <p>
+                        <strong>Credential ID:</strong>
+                        ${result.credentialID}
+                    </p>
+
+                    <p>
+                        <strong>Qualification:</strong>
+                        ${result.qualificationTitle}
+                    </p>
+
+                    <p>
+                        <strong>Institution:</strong>
+                        ${result.issuingInstitution}
+                    </p>
+
+                    <p>
+                        <strong>Issue Date:</strong>
+                        ${issueDate.toLocaleDateString()}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        ${statuses[result.status]}
+                    </p>
+
+                    <p>
+                        <strong>Valid:</strong>
+                        ${result.valid ? "Yes" : "No"}
+                    </p>
+
+                </div>
+            `;
+
+        } catch(error) {
+
+            console.error(error);
+
+            alert(
+                error.reason ||
+                error.message
+            );
+        }
+    }
+
+</script>
+
+</body>
+</html>
