@@ -7,3 +7,4 @@ To setup the CertProff smart contracts, there are a few steps to take:
 6. in command line, navigate to the Assignment3 directory and run lite-server
 7. throught the metamask extension, select account1, scroll to the bottom of the html front end, and select 'connect metamask'
 8. Now, you should be able to interact with the contracts.
+NOTE: each time an account is switched, use the connect metamask button afterwards.
